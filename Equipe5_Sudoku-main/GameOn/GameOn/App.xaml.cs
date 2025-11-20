@@ -14,7 +14,7 @@ namespace GameOn
         {
             base.OnStartup(e);
 
-            AutoUpdater.Start("https://raw.githubusercontent.com/TON_USER/TON_REPO/main/update.xml");
+            AutoUpdater.Start("https://raw.githubusercontent.com/dev-2232508/Deploiement/main/update.xml");
         }
     }
 
