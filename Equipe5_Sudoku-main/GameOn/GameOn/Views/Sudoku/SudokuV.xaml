@@ -1,0 +1,175 @@
+﻿<UserControl x:Class="GameOn.Views.Sudoku.SudokuV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodel="clr-namespace:GameOn.ViewModels"
+             xmlns:conv="clr-namespace:GameOn"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewmodel:SudokuVM}"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{DynamicResource MaterialDesignPaper}">
+
+    <UserControl.Resources>
+        <conv:NullableIntToStringConverter x:Key="NullableIntToStringConverter"/>
+
+        <!-- 🎨 Gradient background brush -->
+        <LinearGradientBrush x:Key="SudokuBackgroundGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FFEDF1F7" Offset="0"/>
+            <GradientStop Color="#FFDCE4EF" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- 🧩 ReadOnly Cell color converter (placeholder if needed) -->
+        <SolidColorBrush x:Key="ReadOnlyCellBrush" Color="#E3E8EF"/>
+        <SolidColorBrush x:Key="EditableCellBrush" Color="#FFFFFF"/>
+
+        <!-- ✨ Sudoku Cell Style -->
+        <Style x:Key="SudokuCellTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Width" Value="52"/>
+            <Setter Property="Height" Value="52"/>
+            <Setter Property="MaxLength" Value="1"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#2D3748"/>
+            <Setter Property="materialDesign:HintAssist.IsFloating" Value="False"/>
+            <EventSetter Event="PreviewTextInput" Handler="SudokuCell_PreviewTextInput"/>
+            <EventSetter Event="PreviewKeyDown" Handler="SudokuCell_PreviewKeyDown"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource SudokuBackgroundGradient}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.2*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.25*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.15*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.25*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 🏁 Header -->
+        <materialDesign:Card Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                             Margin="15" Padding="15"
+                             Background="{DynamicResource PrimaryHueDarkBrush}"
+                             UniformCornerRadius="10">
+            <Label Content="{Binding MessageFinDePartie}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" FontWeight="Bold"></Label>
+                   
+        </materialDesign:Card>
+
+        <!-- 🎯 Sudoku Grid -->
+        <materialDesign:Card Grid.Row="1" Grid.Column="1"
+                             Margin="10"
+                             Padding="25"
+                             Background="#F5F7FA"
+                             UniformCornerRadius="12">
+            <Border BorderThickness="2"
+                    CornerRadius="10"
+                    BorderBrush="#B0BEC5"
+                    Background="WhiteSmoke"
+                    Padding="15">
+                <ScrollViewer x:Name="Grille" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Visibility="Hidden">
+                    <Border BorderThickness="3"
+                            CornerRadius="8"
+                            BorderBrush="#90A4AE"
+                            Background="White"
+                            Padding="12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <ItemsControl ItemsSource="{Binding Cellules}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="9" Columns="9"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderThickness="1"
+                                            CornerRadius="4"
+                                            Margin="2"
+                                            BorderBrush="#CFD8DC"
+                                            Background="{Binding IsReadOnly, Converter={StaticResource ReadOnlyToBrushConverter}}">
+                                        <TextBox Text="{Binding Value, Converter={StaticResource NullableIntToStringConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                 IsReadOnly="{Binding IsReadOnly}"
+                                                 Style="{StaticResource SudokuCellTextBoxStyle}"
+                                                 AutomationProperties.Name="{Binding NameCell}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </ScrollViewer>
+            </Border>
+        </materialDesign:Card>
+
+        <!-- ⚙️ Options Panel -->
+        <StackPanel Grid.Row="1" Grid.Column="2"
+            Margin="10"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Stretch">
+            <materialDesign:Card Padding="15"
+                         UniformCornerRadius="10"
+                         Background="#F8FAFC">
+                <StackPanel>
+                    <TextBlock Text="Options"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="#374151"
+                       Margin="0,0,0,10"/>
+
+                    <Button 
+                         x:Name="VerifierButton"
+                    Content="Vérifier"
+                    Style="{StaticResource MaterialDesignFlatLightBgButton}"
+                    FontSize="16"
+                    Background="{DynamicResource PrimaryHueMidBrush}"
+                    Padding="12,6"
+                    Command="{Binding CheckGridCommand}"
+                    HorizontalAlignment="Stretch"
+                    Cursor="Hand" Click="VerifierButton_Click"/>
+
+                    <Button
+                    x:Name="JouerButton"
+                    Content="Jouer"
+                    Style="{StaticResource MaterialDesignFlatLightBgButton}"
+                    FontSize="16"
+                    Padding="10,5"
+                    HorizontalAlignment="Stretch"
+                    Cursor="Hand"
+                    Click="JouerButton_Click"/>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+
+        <!-- ⏱ Footer Timer -->
+        <materialDesign:Card Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                     Margin="15"
+                     Padding="12"
+                     Background="#F1F5F9"
+                     UniformCornerRadius="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="Temps écoulé :"
+                   FontWeight="SemiBold"
+                   FontSize="15"
+                   Foreground="#334155"
+                   VerticalAlignment="Center"
+                   Margin="0,0,5,0"/>
+                <!-- Remplace le Spacing par un Margin -->
+                <TextBlock x:Name="TimerLabel"
+                   Text="00:00:00"
+                   FontSize="17"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource PrimaryHueMidBrush}"
+                   VerticalAlignment="Center"/>
+            </StackPanel>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>
