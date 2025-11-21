@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item>
   <version>1.0.1.0</version>
-  <url>https://github.com/dev-2232508/Deploiement/releases/download/1.0.1/GameOn-Setup-1.0.1.0.exe</url>
+  <url>https://github.com/dev-2232508/Deploiement/releases/download/1.0.1.0/GameOn-Setup-1.0.1.0.exe</url>
   <changelog>https://raw.githubusercontent.com/dev-2232508/Deploiement/main/changelog.txt</changelog>
   <mandatory>false</mandatory>
 </item>
