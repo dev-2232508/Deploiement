@@ -2,7 +2,7 @@
 ; Application WPF C# .NET 8.0 avec configuration MySQL
 
 #define MyAppName "GameOn"
-#define MyAppVersion "1.0.0.0"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "Votre Société"
 #define MyAppExeName "GameOn.exe"
 
